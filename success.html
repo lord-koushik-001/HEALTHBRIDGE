@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Success</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>Registration Successful 🎉</h1>
+
+        <p>
+            Thank you {{ name }}
+        </p>
+
+        <p>
+            You have successfully registered for
+            <strong>{{ camp }}</strong>
+        </p>
+
+        <a href="/">
+            Back to Home
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>
+<footer>
+    <p>
+        Medical Camp Registration Portal © 2026
+    </p>
+</footer>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav>
+    <a href="/" class="logo">HEALTHBRIDGE</a>
+    <a href="/">Home</a>
+    <a href="/camps">Camp Details</a>
+    <a href="/register">Register</a>
+    <a href="/about">About</a>
+    <a href="/contact">Contact</a>
+</nav>
+
+<div class="container">
+
+    <h1>Camp Registration</h1>
+
+    <div class="card">
+
+        <form method="POST">
+
+            <label>Full Name</label><br>
+            <input type="text"
+                   name="name"
+                   required><br><br>
+
+            <label>Age</label><br>
+            <input type="number"
+                   name="age"
+                   required><br><br>
+
+            <label>Phone Number</label><br>
+            <input type="tel"
+                   name="phone"
+                   required><br><br>
+
+            <label>Email</label><br>
+            <input type="email"
+                   name="email"
+                   required><br><br>
+
+            <label>Select Camp</label><br>
+
+            <select name="camp" required>
+
+                <option value="">
+                    Choose a Camp
+                </option>
+
+                <option>
+                    General Health Camp
+                </option>
+
+                <option>
+                    Eye Checkup Camp
+                </option>
+
+                <option>
+                    Dental Camp
+                </option>
+
+                <option>
+                    Blood Donation Camp
+                </option>
+
+            </select>
+
+            <br><br>
+
+            <button type="submit">
+                Register
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>
+<footer>
+    <p>
+        HealthBridge Medical Camp Registration Portal © 2026
+    </p>
+</footer>
