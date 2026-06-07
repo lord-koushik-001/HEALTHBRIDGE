@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medical Camps — HealthBridge</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+
+    /* ── CAMPS HERO ── */
+    .camps-hero {
+      min-height: 60vh;
+      display: flex;
+      align-items: flex-end;
+      padding: calc(var(--nav-h) + 80px) 40px 80px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+    .camps-hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 90% 40%, rgba(0,229,255,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 60% at 10% 80%, rgba(255,45,85,0.04) 0%, transparent 50%),
+        linear-gradient(180deg, #050507 0%, #07070f 100%);
+    }
+    .camps-hero-bg::before {
+      content: 'CAMPS';
+      position: absolute;
+      right: -20px; bottom: -40px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 260px;
+      color: rgba(255,255,255,0.018);
+      line-height: 1;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .camps-hero-inner {
+      width: min(1100px, 90%);
+      margin: auto;
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: end;
+    }
+    .camps-hero-inner h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(56px, 8vw, 100px);
+      font-weight: 900;
+      font-style: italic;
+      text-transform: uppercase;
+      letter-spacing: -2px;
+      line-height: 0.9;
+      animation: fade-up 0.6s ease both;
+    }
+    .camps-hero-inner p {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.8;
+      animation: fade-up 0.6s 0.15s ease both;
+      margin-bottom: 30px;
+    }
+    .camps-meta-strip {
+      display: flex;
+      gap: 30px;
+      animation: fade-up 0.6s 0.25s ease both;
+    }
+    .camps-meta-item .m-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .camps-meta-item .m-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      color: var(--accent);
+      letter-spacing: 2px;
+    }
+
+    /* ── SEARCH & FILTER BAR ── */
+    .search-section {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 40px;
+      z-index: 100;
+    }
+    .search-inner {
+      width: min(1100px, 90%);
+      margin: auto;
+    }
+    .search-row {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 2px;
+    }
+    .search-box {
+      flex: 1;
+      position: relative;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 18px 20px 18px 50px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px;
+      border-radius: 2px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      margin-bottom: 0;
+    }
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,229,255,0.08);
+    }
+    .search-box input::placeholder { color: var(--muted); }
+    .search-icon {
+      position: absolute;
+      left: 18px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 18px;
+      pointer-events: none;
+    }
+    .filter-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+    }
+    .filter-select-wrap {
+      position: relative;
+    }
+    .filter-select-wrap select {
+      width: 100%;
+      padding: 16px 44px 16px 20px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: 2px;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      transition: border-color 0.2s;
+      margin-bottom: 0;
+    }
+    .filter-select-wrap select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .filter-select-wrap select option { background: var(--bg2); color: var(--text); text-transform: none; font-weight: 400; font-size: 13px; }
+    .filter-icon {
+      position: absolute;
+      right: 16px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 16px;
+      pointer-events: none;
+    }
+    .search-results-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .results-count {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .results-count span { color: var(--accent); }
+    .clear-btn {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: color 0.2s;
+      display: none;
+    }
+    .clear-btn:hover { color: var(--accent2); }
+    .clear-btn.visible { display: block; }
+
+    /* ── ACTIVE FILTER CHIPS ── */
+    .filter-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .chip {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(0,229,255,0.08);
+      border: 1px solid rgba(0,229,255,0.2);
+      padding: 5px 12px;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .chip:hover { background: rgba(0,229,255,0.15); }
+    .chip .chip-x { opacity: 0.6; font-size: 14px; }
+
+    /* ── CAMPS LIST ── */
+    .camps-section {
+      padding: 60px 0 40px;
+    }
+    .camps-inner {
+      width: min(1100px, 90%);
+      margin: auto;
+    }
+    .camp-full-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 30px;
+    }
+    .camp-full-card {
+      background: var(--surface);
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      align-items: center;
+      gap: 0;
+      transition: background 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .camp-full-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--accent);
+      transform: scaleY(0);
+      transition: transform 0.35s;
+      transform-origin: top;
+    }
+    .camp-full-card:hover { background: var(--surface2); }
+    .camp-full-card:hover::before { transform: scaleY(1); }
+    .card-icon-col {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      padding: 36px 0 36px 30px;
+    }
+    .card-body-col { padding: 36px 30px; }
+    .card-body-col .camp-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .card-body-col h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .card-body-col p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 600px;
+      margin-bottom: 18px;
+    }
+    .card-meta-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .meta-chip {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .meta-chip .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.6;
+    }
+    .card-cta-col {
+      padding: 36px 36px 36px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+    .spots-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent2);
+      background: rgba(255,45,85,0.08);
+      border: 1px solid rgba(255,45,85,0.2);
+      padding: 5px 12px;
+      border-radius: 2px;
+    }
+    .spots-badge.green {
+      color: #00e5b0;
+      background: rgba(0,229,176,0.08);
+      border-color: rgba(0,229,176,0.2);
+    }
+
+    /* Category tag colors */
+    .tag-general { color: #00e5ff; }
+    .tag-eye     { color: #a78bfa; }
+    .tag-dental  { color: #34d399; }
+    .tag-blood   { color: var(--accent2); }
+    .tag-cardiac { color: #fb923c; }
+    .tag-sports  { color: #facc15; }
+
+    /* No results */
+    .no-results {
+      display: none;
+      text-align: center;
+      padding: 80px 40px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .no-results.show { display: block; }
+    .no-results h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .no-results p { font-size: 14px; color: var(--muted); }
+
+    /* ── WHAT TO EXPECT ── */
+    .expect-section {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .expect-inner { width: min(1100px, 90%); margin: auto; }
+    .expect-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 50px;
+    }
+    .expect-card {
+      background: var(--surface);
+      padding: 36px 28px;
+      transition: background 0.3s;
+    }
+    .expect-card:hover { background: var(--surface2); }
+    .expect-card .e-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      color: rgba(0,229,255,0.15);
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+    .expect-card h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .expect-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+    /* ── ELIGIBILITY TABLE ── */
+    .eligibility-section { padding: 100px 0; border-bottom: 1px solid var(--border); }
+    .eligibility-inner { width: min(1100px, 90%); margin: auto; }
+    .elig-table { width: 100%; border-collapse: collapse; margin-top: 40px; border: 1px solid var(--border); }
+    .elig-table thead tr { background: var(--surface2); }
+    .elig-table th {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 18px 24px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .elig-table td {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      color: rgba(240,240,245,0.7);
+      vertical-align: top;
+    }
+    .elig-table tr:hover td { background: var(--surface); }
+    .elig-table td:first-child {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+    .check { color: #00e5b0; }
+
+    /* ── CTA ── */
+    .camps-cta {
+      padding: 100px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .camps-cta::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(0,229,255,0.05) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .camps-cta h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(40px, 6vw, 72px);
+      font-weight: 900;
+      font-style: italic;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+      line-height: 0.95;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .camps-cta p {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+      position: relative;
+    }
+    .camps-cta .cta-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+    }
+
+    @media (max-width: 900px) {
+      .camps-hero-inner { grid-template-columns: 1fr; gap: 30px; }
+      .camp-full-card { grid-template-columns: 60px 1fr; }
+      .card-cta-col { display: none; }
+      .expect-grid { grid-template-columns: 1fr 1fr; }
+      .filter-row { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .expect-grid { grid-template-columns: 1fr; }
+      .filter-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="/" class="logo">HEALTHBRIDGE</a>
+  <a href="/">Home</a>
+  <a href="/camps">Camps</a>
+  <a href="/register">Register</a>
+  <a href="/about">About</a>
+  <a href="/contact">Contact</a>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="camps-hero">
+  <div class="camps-hero-bg"></div>
+  <div class="camps-hero-inner">
+    <div>
+      <div class="section-label">June – July 2026</div>
+      <h1>Upcoming<br><span style="-webkit-text-stroke:2px var(--accent);-webkit-text-fill-color:transparent;">Medical</span><br>Camps</h1>
+    </div>
+    <div>
+      <p>Six specialized free camps across South India — staffed by certified doctors, open to everyone. No documents, no fees, no barriers.</p>
+      <div class="camps-meta-strip">
+        <div class="camps-meta-item"><div class="m-label">Camps</div><div class="m-value">06</div></div>
+        <div class="camps-meta-item"><div class="m-label">Cities</div><div class="m-value">06</div></div>
+        <div class="camps-meta-item"><div class="m-label">Cost</div><div class="m-value">₹0</div></div>
+        <div class="camps-meta-item"><div class="m-label">Spots Left</div><div class="m-value">~400</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SEARCH & FILTER ── -->
+<div class="search-section">
+  <div class="search-inner">
+
+    <!-- Search Input -->
+    <div class="search-row">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search by camp name or keyword..." oninput="applyFilters()">
+      </div>
+    </div>
+
+    <!-- Filter Dropdowns -->
+    <div class="filter-row" style="margin-top:2px;">
+      <div class="filter-select-wrap">
+        <select id="filterCategory" onchange="applyFilters()">
+          <option value="">All Categories</option>
+          <option value="general">General Health</option>
+          <option value="eye">Eye Care</option>
+          <option value="dental">Dental</option>
+          <option value="blood">Blood Donation</option>
+          <option value="cardiac">Cardiac & Fitness</option>
+          <option value="sports">Sports & Orthopedic</option>
+        </select>
+        <span class="filter-icon">🏷️</span>
+      </div>
+      <div class="filter-select-wrap">
+        <select id="filterCity" onchange="applyFilters()">
+          <option value="">All Cities</option>
+          <option value="coimbatore">Coimbatore</option>
+          <option value="chennai">Chennai</option>
+          <option value="bangalore">Bangalore</option>
+          <option value="kochi">Kochi</option>
+          <option value="hyderabad">Hyderabad</option>
+          <option value="mumbai">Mumbai</option>
+        </select>
+        <span class="filter-icon">📍</span>
+      </div>
+      <div class="filter-select-wrap">
+        <select id="filterMonth" onchange="applyFilters()">
+          <option value="">All Dates</option>
+          <option value="june">June 2026</option>
+          <option value="july">July 2026</option>
+        </select>
+        <span class="filter-icon">📅</span>
+      </div>
+      <div class="filter-select-wrap">
+        <select id="filterAge" onchange="applyFilters()">
+          <option value="">All Ages</option>
+          <option value="all">Open to All</option>
+          <option value="adult">Adults (18+)</option>
+          <option value="child">Children (5+)</option>
+        </select>
+        <span class="filter-icon">👤</span>
+      </div>
+    </div>
+
+    <!-- Results Bar -->
+    <div class="search-results-bar">
+      <div class="results-count">Showing <span id="resultCount">6</span> of 6 camps</div>
+      <button class="clear-btn" id="clearBtn" onclick="clearFilters()">✕ Clear Filters</button>
+    </div>
+
+    <!-- Active Chips -->
+    <div class="filter-chips" id="filterChips"></div>
+
+  </div>
+</div>
+
+<!-- ── CAMPS LIST ── -->
+<section class="camps-section">
+  <div class="camps-inner">
+    <div class="camp-full-grid" id="campGrid">
+
+      <div class="camp-full-card" data-type="general" data-city="coimbatore" data-month="june" data-age="all">
+        <div class="card-icon-col">🩺</div>
+        <div class="card-body-col">
+          <div class="camp-tag tag-general">General Health · Free Entry</div>
+          <h2>General Health Camp</h2>
+          <p>Comprehensive health screening including blood pressure monitoring, blood sugar testing, BMI assessment, and one-on-one consultation with a general physician.</p>
+          <div class="card-meta-row">
+            <div class="meta-chip"><span class="dot"></span>15 June 2026</div>
+            <div class="meta-chip"><span class="dot"></span>Coimbatore</div>
+            <div class="meta-chip"><span class="dot"></span>9:00 AM – 5:00 PM</div>
+            <div class="meta-chip"><span class="dot"></span>Open to All Ages</div>
+          </div>
+        </div>
+        <div class="card-cta-col">
+          <span class="spots-badge green">Spots Available</span>
+          <a href="/register"><button class="primary-btn" style="padding:12px 24px;font-size:13px;">Register →</button></a>
+        </div>
+      </div>
+
+      <div class="camp-full-card" data-type="eye" data-city="chennai" data-month="june" data-age="all">
+        <div class="card-icon-col">👁️</div>
+        <div class="card-body-col">
+          <div class="camp-tag tag-eye">Eye Care · Free Entry</div>
+          <h2>Eye Checkup Camp</h2>
+          <p>Full vision assessment including visual acuity, eye pressure measurement, colour blindness screening, and retinal examination. Free prescription provided.</p>
+          <div class="card-meta-row">
+            <div class="meta-chip"><span class="dot"></span>20 June 2026</div>
+            <div class="meta-chip"><span class="dot"></span>Chennai</div>
+            <div class="meta-chip"><span class="dot"></span>9:00 AM – 4:00 PM</div>
+            <div class="meta-chip"><span class="dot"></span>All Ages Welcome</div>
+          </div>
+        </div>
+        <div class="card-cta-col">
+          <span class="spots-badge green">Spots Available</span>
+          <a href="/register"><button class="primary-btn" style="padding:12px 24px;font-size:13px;">Register →</button></a>
+        </div>
+      </div>
+
+      <div class="camp-full-card" data-type="dental" data-city="bangalore" data-month="june" data-age="child">
+        <div class="card-icon-col">🦷</div>
+        <div class="card-body-col">
+          <div class="camp-tag tag-dental">Dental · Free Entry</div>
+          <h2>Dental Camp</h2>
+          <p>Complete oral health checkup including cavity detection, gum health assessment, teeth cleaning advice, and personalised oral hygiene guidance from certified professionals.</p>
+          <div class="card-meta-row">
+            <div class="meta-chip"><span class="dot"></span>25 June 2026</div>
+            <div class="meta-chip"><span class="dot"></span>Bangalore</div>
+            <div class="meta-chip"><span class="dot"></span>10:00 AM – 4:00 PM</div>
+            <div class="meta-chip"><span class="dot"></span>Age 5+</div>
+          </div>
+        </div>
+        <div class="card-cta-col">
+          <span class="spots-badge">Filling Fast</span>
+          <a href="/register"><button class="primary-btn" style="padding:12px 24px;font-size:13px;">Register →</button></a>
+        </div>
+      </div>
+
+      <div class="camp-full-card" data-type="blood" data-city="kochi" data-month="june" data-age="adult">
+        <div class="card-icon-col">🩸</div>
+        <div class="card-body-col">
+          <div class="camp-tag tag-blood">Blood Donation · Free Entry</div>
+          <h2>Blood Donation Camp</h2>
+          <p>Safe, supervised blood donation with pre-donation health screening, post-donation refreshments, and certificate of appreciation. One donation can save up to 3 lives.</p>
+          <div class="card-meta-row">
+            <div class="meta-chip"><span class="dot"></span>30 June 2026</div>
+            <div class="meta-chip"><span class="dot"></span>Kochi</div>
+            <div class="meta-chip"><span class="dot"></span>8:00 AM – 3:00 PM</div>
+            <div class="meta-chip"><span class="dot"></span>Age 18–65</div>
+          </div>
+        </div>
+        <div class="card-cta-col">
+          <span class="spots-badge green">Spots Available</span>
+          <a href="/register"><button class="primary-btn" style="padding:12px 24px;font-size:13px;">Register →</button></a>
+        </div>
+      </div>
+
+      <div class="camp-full-card" data-type="cardiac" data-city="hyderabad" data-month="july" data-age="adult">
+        <div class="card-icon-col">🏥</div>
+        <div class="card-body-col">
+          <div class="camp-tag tag-cardiac">Cardiac & Fitness · Free Entry</div>
+          <h2>Cardiac Health & Fitness Camp</h2>
+          <p>Heart health screening, ECG testing, blood pressure monitoring, cholesterol check, and fitness risk assessment with specialist cardiologists and sports physicians.</p>
+          <div class="card-meta-row">
+            <div class="meta-chip"><span class="dot"></span>05 July 2026</div>
+            <div class="meta-chip"><span class="dot"></span>Hyderabad</div>
+            <div class="meta-chip"><span class="dot"></span>9:00 AM – 4:00 PM</div>
+            <div class="meta-chip"><span class="dot"></span>Age 18+</div>
+          </div>
+        </div>
+        <div class="card-cta-col">
+          <span class="spots-badge green">Spots Available</span>
+          <a href="/register"><button class="primary-btn" style="padding:12px 24px;font-size:13px;">Register →</button></a>
+        </div>
+      </div>
+
+      <div class="camp-full-card" data-type="sports" data-city="mumbai" data-month="july" data-age="adult">
+        <div class="card-icon-col">🦴</div>
+        <div class="card-body-col">
+          <div class="camp-tag tag-sports">Sports & Orthopedic · Free Entry</div>
+          <h2>Sports Injury & Orthopedic Camp</h2>
+          <p>Joint mobility assessment, posture analysis, injury prevention screening, bone health evaluation, and expert orthopedic consultation for athletes and active individuals.</p>
+          <div class="card-meta-row">
+            <div class="meta-chip"><span class="dot"></span>10 July 2026</div>
+            <div class="meta-chip"><span class="dot"></span>Mumbai</div>
+            <div class="meta-chip"><span class="dot"></span>9:00 AM – 5:00 PM</div>
+            <div class="meta-chip"><span class="dot"></span>Age 18+</div>
+          </div>
+        </div>
+        <div class="card-cta-col">
+          <span class="spots-badge green">Spots Available</span>
+          <a href="/register"><button class="primary-btn" style="padding:12px 24px;font-size:13px;">Register →</button></a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- No Results State -->
+    <div class="no-results" id="noResults">
+      <h3>No Camps Found</h3>
+      <p>Try adjusting your filters or search term.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── WHAT TO EXPECT ── -->
+<section class="expect-section">
+  <div class="expect-inner">
+    <div class="section-label reveal">At the Camp</div>
+    <h2 class="reveal" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(32px,4vw,52px);font-weight:900;font-style:italic;text-transform:uppercase;letter-spacing:-0.5px;">
+      What to<br><span style="-webkit-text-stroke:2px var(--accent);-webkit-text-fill-color:transparent;">Expect</span>
+    </h2>
+    <div class="expect-grid reveal">
+      <div class="expect-card"><div class="e-num">01</div><h3>Walk-In Welcome</h3><p>No appointment needed on the day. Show up, check in at the registration desk, and you'll be guided to the right station.</p></div>
+      <div class="expect-card"><div class="e-num">02</div><h3>Health Screening</h3><p>Certified medical staff conduct your checkup in a clean, private setting. Results shared with you on the spot.</p></div>
+      <div class="expect-card"><div class="e-num">03</div><h3>Doctor Consultation</h3><p>Every participant gets 1-on-1 time with a qualified doctor to discuss findings and ask questions.</p></div>
+      <div class="expect-card"><div class="e-num">04</div><h3>Free Medicines</h3><p>Basic medications and prescriptions provided free of charge based on the doctor's assessment.</p></div>
+      <div class="expect-card"><div class="e-num">05</div><h3>Health Report</h3><p>Leave with a written health summary to keep for your records or share with your family physician.</p></div>
+      <div class="expect-card"><div class="e-num">06</div><h3>Follow-Up Support</h3><p>Our team will connect you with nearby clinics or arrange a doctor call within 72 hours if needed.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ELIGIBILITY TABLE ── -->
+<section class="eligibility-section">
+  <div class="eligibility-inner">
+    <div class="section-label reveal">Eligibility</div>
+    <h2 class="reveal" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(32px,4vw,52px);font-weight:900;font-style:italic;text-transform:uppercase;letter-spacing:-0.5px;">
+      Who Can<br><span style="-webkit-text-stroke:2px var(--accent);-webkit-text-fill-color:transparent;">Attend?</span>
+    </h2>
+    <div class="reveal" style="overflow-x:auto;">
+      <table class="elig-table">
+        <thead>
+          <tr><th>Camp</th><th>Age Range</th><th>Documents</th><th>Cost</th><th>Special Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>General Health Camp</td><td>All ages</td><td><span class="check">✓</span> None required</td><td><span class="check">✓</span> Free</td><td>Fasting recommended for sugar test</td></tr>
+          <tr><td>Eye Checkup Camp</td><td>All ages</td><td><span class="check">✓</span> None required</td><td><span class="check">✓</span> Free</td><td>Bring existing glasses if you wear them</td></tr>
+          <tr><td>Dental Camp</td><td>5 years and above</td><td><span class="check">✓</span> None required</td><td><span class="check">✓</span> Free</td><td>Children under 12 need a parent present</td></tr>
+          <tr><td>Blood Donation Camp</td><td>18–65 years</td><td><span class="check">✓</span> Any photo ID</td><td><span class="check">✓</span> Free</td><td>Min 50kg · No donation in past 3 months</td></tr>
+          <tr><td>Cardiac Health Camp</td><td>18 years and above</td><td><span class="check">✓</span> None required</td><td><span class="check">✓</span> Free</td><td>Wear comfortable clothing for ECG test</td></tr>
+          <tr><td>Sports & Orthopedic Camp</td><td>18 years and above</td><td><span class="check">✓</span> None required</td><td><span class="check">✓</span> Free</td><td>Bring prior X-rays or scans if available</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="camps-cta">
+  <h2>Don't Miss<br><span style="-webkit-text-stroke:2px var(--accent);-webkit-text-fill-color:transparent;">Your Camp</span></h2>
+  <p>Spots fill up fast. Register now to secure your place at the camp that's right for you.</p>
+  <div class="cta-buttons">
+    <a href="/register"><button class="primary-btn">Register for Free →</button></a>
+    <a href="/contact" class="secondary-btn">Have a Question?</a>
+  </div>
+</section>
+
+<footer>
+  <p>HealthBridge Medical Camp Registration Portal &copy; 2026</p>
+</footer>
+
+<script>
+  const cards = document.querySelectorAll('.camp-full-card');
+  const resultCount = document.getElementById('resultCount');
+  const noResults = document.getElementById('noResults');
+  const clearBtn = document.getElementById('clearBtn');
+  const chipsContainer = document.getElementById('filterChips');
+
+  function applyFilters() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const category = document.getElementById('filterCategory').value;
+    const city = document.getElementById('filterCity').value;
+    const month = document.getElementById('filterMonth').value;
+    const age = document.getElementById('filterAge').value;
+
+    let visible = 0;
+    cards.forEach(card => {
+      const name = card.querySelector('h2').textContent.toLowerCase();
+      const desc = card.querySelector('p').textContent.toLowerCase();
+      const matchSearch = !search || name.includes(search) || desc.includes(search);
+      const matchCat  = !category || card.dataset.type === category;
+      const matchCity = !city     || card.dataset.city === city;
+      const matchMon  = !month    || card.dataset.month === month;
+      const matchAge  = !age      || card.dataset.age === age || card.dataset.age === 'all';
+
+      const show = matchSearch && matchCat && matchCity && matchMon && matchAge;
+      card.style.display = show ? 'grid' : 'none';
+      if (show) visible++;
+    });
+
+    resultCount.textContent = visible;
+    noResults.classList.toggle('show', visible === 0);
+
+    const hasFilter = search || category || city || month || age;
+    clearBtn.classList.toggle('visible', !!hasFilter);
+    renderChips(search, category, city, month, age);
+  }
+
+  function renderChips(search, category, city, month, age) {
+    chipsContainer.innerHTML = '';
+    const labels = {
+      category: { general:'General Health', eye:'Eye Care', dental:'Dental', blood:'Blood Donation', cardiac:'Cardiac & Fitness', sports:'Sports & Orthopedic' },
+      city: { coimbatore:'Coimbatore', chennai:'Chennai', bangalore:'Bangalore', kochi:'Kochi', hyderabad:'Hyderabad', mumbai:'Mumbai' },
+      month: { june:'June 2026', july:'July 2026' },
+      age: { all:'All Ages', adult:'Adults (18+)', child:'Children (5+)' }
+    };
+    if (search) addChip(`"${search}"`, () => { document.getElementById('searchInput').value = ''; applyFilters(); });
+    if (category) addChip(labels.category[category], () => { document.getElementById('filterCategory').value = ''; applyFilters(); });
+    if (city) addChip(labels.city[city], () => { document.getElementById('filterCity').value = ''; applyFilters(); });
+    if (month) addChip(labels.month[month], () => { document.getElementById('filterMonth').value = ''; applyFilters(); });
+    if (age) addChip(labels.age[age], () => { document.getElementById('filterAge').value = ''; applyFilters(); });
+  }
+
+  function addChip(label, onRemove) {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.innerHTML = `${label} <span class="chip-x">✕</span>`;
+    chip.onclick = onRemove;
+    chipsContainer.appendChild(chip);
+  }
+
+  function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterCategory').value = '';
+    document.getElementById('filterCity').value = '';
+    document.getElementById('filterMonth').value = '';
+    document.getElementById('filterAge').value = '';
+    applyFilters();
+  }
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
